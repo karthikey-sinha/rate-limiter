@@ -91,7 +91,7 @@ class TestTokenBucket:
         assert bucket.allow_request("user2") is True
         assert bucket.allow_request("user2") is True
     
-   def test_get_remaining_tokens(self):
+    def test_get_remaining_tokens(self):
         """Test getting remaining token count."""
         bucket = TokenBucket(max_tokens=10, refill_rate=1)
         
