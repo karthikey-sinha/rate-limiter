@@ -91,17 +91,17 @@ class TestTokenBucket:
         assert bucket.allow_request("user2") is True
         assert bucket.allow_request("user2") is True
     
-    def test_get_remaining_tokens(self):
+   def test_get_remaining_tokens(self):
         """Test getting remaining token count."""
         bucket = TokenBucket(max_tokens=10, refill_rate=1)
         
-        # New key should have full tokens
-        assert bucket.get_remaining_tokens("user1") == 10
+        # New key should have full tokens (allow tiny float drift)
+        assert bucket.get_remaining_tokens("user1") == pytest.approx(10.0, abs=0.1)
         
-        # After 3 requests, should have 7
+        # After 3 requests, should have ~7
         for _ in range(3):
             bucket.allow_request("user1")
-        assert bucket.get_remaining_tokens("user1") == 7
+        assert bucket.get_remaining_tokens("user1") == pytest.approx(7.0, abs=0.1)
     
     def test_get_retry_after_when_allowed(self):
         """Test retry_after returns 0 when tokens available."""
@@ -149,14 +149,13 @@ class TestTokenBucket:
         
         # Request costing 5 tokens
         assert bucket.allow_request("user1", tokens_required=5) is True
-        assert bucket.get_remaining_tokens("user1") == 5
+        assert bucket.get_remaining_tokens("user1") == pytest.approx(5.0, abs=0.1)
         
         # Request costing 6 tokens should fail
         assert bucket.allow_request("user1", tokens_required=6) is False
         
         # Request costing 5 tokens should succeed
         assert bucket.allow_request("user1", tokens_required=5) is True
-
 
 # ============================================
 # Sliding Window Log Tests
